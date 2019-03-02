@@ -1,0 +1,35 @@
+spring:
+logging:
+  level:
+    org.springframework: WARN
+    com.blizzard.documentation.oauth2.demo: INFO
+
+encoding: UTF-8
+token-url: https://us.battle.net/oauth/token
+base-url: https://us.api.blizzard.com
+base-image-url: https://render-us.worldofwarcraft.com/character/
+
+# Seems to be a good balance of least amount of artifacting and good compression for this library
+compression-quality: .925f
+
+image-layout:
+  total-width: 720
+  total-height: 120
+  inset-x: 2
+  inset-y: 2
+  name-x: 220
+  name-y: 40
+  name-font-size: 30f
+  name-font-color: "#deaa00"
+  character-summary-x: 220
+  character-summary-y: 65
+  character-summary-font-size: 12f
+  character-summary-font-color: "#888888"
+  item-level-detail-x: 220
+  item-level-detail-y: 85
+  item-level-detail-font-size: 12f
+  item-level-detail-font-color: "#888888"
+  achievement-points-x: 220
+  achievement-points-y: 105
+  achievement-points-font-size: 12f
+  achievement-points-font-color: "#888888"
