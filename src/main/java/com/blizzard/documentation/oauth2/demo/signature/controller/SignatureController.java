@@ -50,6 +50,8 @@ public class SignatureController {
         @RequestParam(required = true) final String characterName,
         @RequestParam(required = true) final String realmName
     ) throws IOException, URISyntaxException {
+        ImageOutputStream imageOutputStream = null;
+        ImageWriter writer = null;
         try {
             // We need a byte array for returning our image.
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -63,24 +65,28 @@ public class SignatureController {
             jpegParams.setCompressionQuality(appConfig.getCompressionQuality());
 
             // Make an ImageOutputStream that accepts our ByteArrayOutputStream, without needing a lot of additional resources
-            ImageOutputStream imageOutputStream = new MemoryCacheImageOutputStream(baos);
+            imageOutputStream = new MemoryCacheImageOutputStream(baos);
 
             // prep the writer to make a jpg type to our ImageOutputStream
-            ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+            writer = ImageIO.getImageWritersByFormatName("jpg").next();
             writer.setOutput(imageOutputStream);
 
             // Use the writer to output the contents of the image into our ByteArrayOutputStream via the ImageOutputStream
             writer.write(null, new IIOImage(signatureService.generateSignature(characterName, realmName).getData(), null, null), jpegParams);
-
-            // Clean up after ourselves
-            imageOutputStream.close();
-            writer.dispose();
 
             // Return the resulting byte array
             return baos.toByteArray();
         } catch (IOException | URISyntaxException e) {
             log.error(e);
             throw e;
+        } finally {
+            // Clean up after ourselves
+            if(imageOutputStream != null){
+                imageOutputStream.close();
+            }
+            if(writer != null){
+                writer.dispose();
+            }
         }
     }
 }

@@ -222,69 +222,77 @@ public class SignatureImageServiceImpl implements SignatureImageService{
         baseImageImageProcessor.setAntialiasedText(true);
         BufferedImage intermediaryImageBufferedImage = baseImageImageProcessor.getBufferedImage();
 
-        Graphics intermediaryImageBufferedImageGraphics = intermediaryImageBufferedImage.getGraphics();
+        Graphics intermediaryImageBufferedImageGraphics = null;
+        Graphics2D g2d = null;
+        try{
+            intermediaryImageBufferedImageGraphics = intermediaryImageBufferedImage.getGraphics();
+            GraphicsEnvironment localGraphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            try {
+                log.trace("Registering font Merriweather-Regular.ttf");
+                localGraphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(
+                        ClassLoader.getSystemClassLoader().getResource("fonts/merriweather/Merriweather-Regular.ttf").getFile()
+                )));
+                log.trace("Registering font Merriweather-Bold.ttf");
+                localGraphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(
+                        ClassLoader.getSystemClassLoader().getResource("fonts/merriweather/Merriweather-Bold.ttf").getFile()
+                )));
+                log.trace("Registering font Merriweather-BoldItalic.ttf");
+                localGraphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(
+                        ClassLoader.getSystemClassLoader().getResource("fonts/merriweather/Merriweather-BoldItalic.ttf").getFile()
+                )));
+                log.trace("Registering font Merriweather-Italic.ttf");
+                localGraphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(
+                        ClassLoader.getSystemClassLoader().getResource("fonts/merriweather/Merriweather-Italic.ttf").getFile()
+                )));
 
-        GraphicsEnvironment localGraphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        try {
-            log.trace("Registering font Merriweather-Regular.ttf");
-            localGraphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(
-                    ClassLoader.getSystemClassLoader().getResource("fonts/merriweather/Merriweather-Regular.ttf").getFile()
-            )));
-            log.trace("Registering font Merriweather-Bold.ttf");
-            localGraphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(
-                    ClassLoader.getSystemClassLoader().getResource("fonts/merriweather/Merriweather-Bold.ttf").getFile()
-            )));
-            log.trace("Registering font Merriweather-BoldItalic.ttf");
-            localGraphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(
-                    ClassLoader.getSystemClassLoader().getResource("fonts/merriweather/Merriweather-BoldItalic.ttf").getFile()
-            )));
-            log.trace("Registering font Merriweather-Italic.ttf");
-            localGraphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File(
-                    ClassLoader.getSystemClassLoader().getResource("fonts/merriweather/Merriweather-Italic.ttf").getFile()
-            )));
+            } catch (FontFormatException e) {
+                log.error(e);
+                // default font is fine
+            }
 
-        } catch (FontFormatException e) {
-            log.error(e);
-            // default font is fine
+            log.trace("Choosing font Merriweather, as Bold, size 10");
+            intermediaryImageBufferedImageGraphics.setFont(new Font("Merriweather", Font.BOLD, 10));
+
+            g2d = (Graphics2D) intermediaryImageBufferedImageGraphics;
+
+            // Turn on anti-aliasing for text rendering as we're drawing it.
+            g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            // Add the character name line
+            g2d.setColor(Color.decode(nameFontColor));
+            g2d.setFont(intermediaryImageBufferedImageGraphics.getFont().deriveFont(nameFontSize));
+            g2d.drawString(characterItemsGuild.getName(), nameX, nameY);
+
+            log.trace("Choosing font Merriweather, as Plain, size 10");
+            g2d.setFont(new Font("Merriweather", Font.PLAIN, 10));
+
+            // Add the character detail line
+            g2d.setColor(Color.decode(characterSummaryFontColor));
+            g2d.setFont(intermediaryImageBufferedImageGraphics.getFont().deriveFont(characterSummaryFontSize));
+            if(characterItemsGuild.getGuild() != null && characterItemsGuild.getGuild().getName() != null && !characterItemsGuild.getGuild().getName().isEmpty()){
+                g2d.drawString(String.format("Level %s %s of <%s> on %s", characterItemsGuild.getLevel(), className.getName(), characterItemsGuild.getGuild().getName(), characterItemsGuild.getRealm()), characterSummaryX, characterSummaryY);
+            }else{
+                g2d.drawString(String.format("Level %s %s on %s", characterItemsGuild.getLevel(), className.getName(), characterItemsGuild.getRealm()), characterSummaryX, characterSummaryY);
+            }
+
+            // Add the item level detail line
+            g2d.setColor(Color.decode(itemLevelDetailFontColor));
+            g2d.setFont(intermediaryImageBufferedImageGraphics.getFont().deriveFont(itemLevelDetailFontSize));
+            g2d.drawString(String.format("Item Level: %s (%s)", characterItemsGuild.getItems().getAverageItemLevel(), characterItemsGuild.getItems().getAverageItemLevelEquipped()), itemLevelDetailX, itemLevelDetailY);
+
+            // Add the achievement points line
+            g2d.setColor(Color.decode(achievementPointsFontColor));
+            g2d.setFont(intermediaryImageBufferedImageGraphics.getFont().deriveFont(achievementPointsFontSize));
+            g2d.drawString(String.format("Achievement points: %s", characterItemsGuild.getAchievementPoints()), achievementPointsX, achievementPointsY);
         }
-
-        log.trace("Choosing font Merriweather, as Bold, size 10");
-        intermediaryImageBufferedImageGraphics.setFont(new Font("Merriweather", Font.BOLD, 10));
-
-        Graphics2D g2d = (Graphics2D) intermediaryImageBufferedImageGraphics;
-        // Turn on anti-aliasing for text rendering as we're drawing it.
-        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-        // Add the character name line
-        g2d.setColor(Color.decode(nameFontColor));
-        g2d.setFont(intermediaryImageBufferedImageGraphics.getFont().deriveFont(nameFontSize));
-        g2d.drawString(characterItemsGuild.getName(), nameX, nameY);
-
-        log.trace("Choosing font Merriweather, as Plain, size 10");
-        g2d.setFont(new Font("Merriweather", Font.PLAIN, 10));
-
-        // Add the character detail line
-        g2d.setColor(Color.decode(characterSummaryFontColor));
-        g2d.setFont(intermediaryImageBufferedImageGraphics.getFont().deriveFont(characterSummaryFontSize));
-        if(characterItemsGuild.getGuild() != null && characterItemsGuild.getGuild().getName() != null && !characterItemsGuild.getGuild().getName().isEmpty()){
-            g2d.drawString(String.format("Level %s %s of <%s> on %s", characterItemsGuild.getLevel(), className.getName(), characterItemsGuild.getGuild().getName(), characterItemsGuild.getRealm()), characterSummaryX, characterSummaryY);
-        }else{
-            g2d.drawString(String.format("Level %s %s on %s", characterItemsGuild.getLevel(), className.getName(), characterItemsGuild.getRealm()), characterSummaryX, characterSummaryY);
+        finally {
+            if(intermediaryImageBufferedImageGraphics != null){
+                intermediaryImageBufferedImageGraphics.dispose();
+            }
+            if(g2d != null){
+                g2d.dispose();
+            }
         }
-
-        // Add the item level detail line
-        g2d.setColor(Color.decode(itemLevelDetailFontColor));
-        g2d.setFont(intermediaryImageBufferedImageGraphics.getFont().deriveFont(itemLevelDetailFontSize));
-        g2d.drawString(String.format("Item Level: %s (%s)", characterItemsGuild.getItems().getAverageItemLevel(), characterItemsGuild.getItems().getAverageItemLevelEquipped()), itemLevelDetailX, itemLevelDetailY);
-
-        // Add the achievement points line
-        g2d.setColor(Color.decode(achievementPointsFontColor));
-        g2d.setFont(intermediaryImageBufferedImageGraphics.getFont().deriveFont(achievementPointsFontSize));
-        g2d.drawString(String.format("Achievement points: %s", characterItemsGuild.getAchievementPoints()), achievementPointsX, achievementPointsY);
-
-        intermediaryImageBufferedImageGraphics.dispose();
-        g2d.dispose();
-
         return intermediaryImageBufferedImage;
     }
 

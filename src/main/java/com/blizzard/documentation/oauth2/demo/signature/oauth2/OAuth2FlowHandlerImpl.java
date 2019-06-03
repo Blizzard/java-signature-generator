@@ -36,6 +36,8 @@ public class OAuth2FlowHandlerImpl implements OAuth2FlowHandler {
     private String token = null;
     private Instant tokenExpiry = null; // Instant when the token will expire
 
+    private final Object tokenLock = new Object();
+
     /**
      * {@inheritDoc}
      */
@@ -44,15 +46,15 @@ public class OAuth2FlowHandlerImpl implements OAuth2FlowHandler {
         if(isTokenInvalid()){
             log.trace("---");
             log.trace("Fetching/Creating token.");
-            log.trace(String.format("Client Id: %s", envConfig.getClientId()));
-            log.trace(String.format("Client Secret: %s", envConfig.getClientSecret()));
 
             String encodedCredentials = Base64.getEncoder().encodeToString(String.format("%s:%s", envConfig.getClientId(), envConfig.getClientSecret()).getBytes(appConfig.getEncoding()));
-            log.trace(String.format("Encoded Id/Secret: %s", encodedCredentials));
 
             // ------------------------------------------------- Allows testing/mocking of the URL connection object
+            HttpURLConnection con = null;
+
+            try{
             URL url = new URL(appConfig.getTokenUrl(), "", urlStreamHandler);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Authorization", String.format("Basic %s", encodedCredentials));
             con.setDoOutput(true);
@@ -68,16 +70,21 @@ public class OAuth2FlowHandlerImpl implements OAuth2FlowHandler {
 
             // Reads the JSON response and converts it to TokenResponse class or throws an exception
             TokenResponse tokenResponse = objectMapper.readValue(response, TokenResponse.class);
+            synchronized (tokenLock) {
+                tokenExpiry = Instant.now().plusSeconds(tokenResponse.getExpires_in());
+                token = tokenResponse.getAccess_token();
+            }
 
-            tokenExpiry = Instant.now().plusSeconds(tokenResponse.getExpires_in());
-            token = tokenResponse.getAccess_token();
-
-            log.trace(String.format("Token Found: %s", token));
-            log.trace(String.format("Token Expiry: %s", tokenExpiry));
             log.trace("---");
+            } finally {
+                if(con != null){
+                    con.disconnect();
+                }
+            }
         }
-        log.debug(String.format("Returned token: %s", token));
-        return token;
+        synchronized (tokenLock){
+            return token;
+        }
     }
 
     /**
@@ -85,12 +92,14 @@ public class OAuth2FlowHandlerImpl implements OAuth2FlowHandler {
      */
     @Override
     public boolean isTokenInvalid(){
-        if(token == null){
-            return true;
+        synchronized (tokenLock) {
+            if (token == null) {
+                return true;
+            }
+            if (tokenExpiry == null) {
+                return true;
+            }
+            return Instant.now().isAfter(tokenExpiry);
         }
-        if(tokenExpiry == null){
-            return true;
-        }
-        return Instant.now().isAfter(tokenExpiry);
     }
 }
