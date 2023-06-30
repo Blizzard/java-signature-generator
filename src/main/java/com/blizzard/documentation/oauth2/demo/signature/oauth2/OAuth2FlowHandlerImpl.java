@@ -31,7 +31,7 @@ public class OAuth2FlowHandlerImpl implements OAuth2FlowHandler {
     private ObjectMapper objectMapper;
 
     // To allow testing of the URL/Connection
-    private URLStreamHandler urlStreamHandler = new Handler();
+//    private URLStreamHandler urlStreamHandler = new Handler();
 
     private String token = null;
     private Instant tokenExpiry = null; // Instant when the token will expire
@@ -53,7 +53,7 @@ public class OAuth2FlowHandlerImpl implements OAuth2FlowHandler {
             HttpURLConnection con = null;
 
             try{
-            URL url = new URL(appConfig.getTokenUrl(), "", urlStreamHandler);
+            URL url = new URL(appConfig.getTokenUrl(), ""/*, urlStreamHandler*/);
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Authorization", String.format("Basic %s", encodedCredentials));
