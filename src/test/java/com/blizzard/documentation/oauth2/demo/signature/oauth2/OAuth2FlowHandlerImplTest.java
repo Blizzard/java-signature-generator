@@ -29,11 +29,11 @@ import static org.mockito.Mockito.*;
 public class OAuth2FlowHandlerImplTest {
 
     @Mock
-    private AppConfig appConfig;
+    public AppConfig appConfig;
     @Mock
-    private EnvConfig envConfig;
+    public EnvConfig envConfig;
     @Mock
-    private ObjectMapper objectMapper;
+    public ObjectMapper objectMapper;
 
     @InjectMocks
     private OAuth2FlowHandlerImpl oAuth2FlowHandler;
