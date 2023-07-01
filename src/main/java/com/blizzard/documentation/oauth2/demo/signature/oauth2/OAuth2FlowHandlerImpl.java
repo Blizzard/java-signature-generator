@@ -31,7 +31,7 @@ public class OAuth2FlowHandlerImpl implements OAuth2FlowHandler {
     private ObjectMapper objectMapper;
 
     // To allow testing of the URL/Connection
-//    private URLStreamHandler urlStreamHandler = new Handler();
+    private URLStreamHandler urlStreamHandler = new URLStreamHandler();
 
     private String token = null;
     private Instant tokenExpiry = null; // Instant when the token will expire
