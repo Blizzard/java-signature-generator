@@ -65,7 +65,7 @@ public class OAuth2FlowHandlerImplTest {
         doReturn(clientId).when(envConfig).getClientId();
         doReturn(clientSecret).when(envConfig).getClientSecret();
         doReturn(encodeFormat).when(appConfig).getEncoding();
-        doReturn(new URL("https://us.shop.battle.net/en-us?from=root")).when(appConfig).getTokenUrl();
+        doReturn(new URL("https://oauth.battle.net/token/")).when(appConfig).getTokenUrl();
         doReturn(mockTokenResponse).when(objectMapper).readValue(anyString(), eq(TokenResponse.class));
 
         doReturn(byteArrayInputStream).when(mockUrlConnection).getInputStream();
