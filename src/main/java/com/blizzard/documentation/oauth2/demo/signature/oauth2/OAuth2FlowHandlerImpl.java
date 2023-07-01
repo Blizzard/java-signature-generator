@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import sun.net.www.protocol.https.Handler;
 
 import java.io.IOException;
-import java.net.HttpsURLConnection;
+import javax.net.ssl.HttpsURLConnection;
 import java.net.URL;
 import java.net.URLStreamHandler;
 import java.time.Instant;
@@ -50,7 +50,7 @@ public class OAuth2FlowHandlerImpl implements OAuth2FlowHandler {
             String encodedCredentials = Base64.getEncoder().encodeToString(String.format("%s:%s", envConfig.getClientId(), envConfig.getClientSecret()).getBytes(appConfig.getEncoding()));
 
             // ------------------------------------------------- Allows testing/mocking of the URL connection object
-            HttpURLConnection con = null;
+            HttpsURLConnection con = null;
 
             try{
             URL url = new URL(appConfig.getTokenUrl(), ""/*, urlStreamHandler*/);
