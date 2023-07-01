@@ -15,7 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
+import javax.net.ssl.HttpsURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
@@ -41,7 +41,7 @@ public class OAuth2FlowHandlerImplTest {
     @Test
     public void getTokenFreshGoldenPath() throws IOException, NoSuchFieldException {
         final String token = "exampleToken";
-        final HttpURLConnection mockUrlConnection = mock(HttpURLConnection.class);
+        final HttpsURLConnection mockUrlConnection = mock(HttpsURLConnection.class);
         final OutputStream outputStream = mock(OutputStream.class);
         final TokenResponse mockTokenResponse = mock(TokenResponse.class);
 
@@ -65,7 +65,7 @@ public class OAuth2FlowHandlerImplTest {
         doReturn(clientId).when(envConfig).getClientId();
         doReturn(clientSecret).when(envConfig).getClientSecret();
         doReturn(encodeFormat).when(appConfig).getEncoding();
-        doReturn(new URL("http://www.google.com/")).when(appConfig).getTokenUrl();
+        doReturn(new URL("https://www.google.com/")).when(appConfig).getTokenUrl();
         doReturn(mockTokenResponse).when(objectMapper).readValue(anyString(), eq(TokenResponse.class));
 
         doReturn(byteArrayInputStream).when(mockUrlConnection).getInputStream();
