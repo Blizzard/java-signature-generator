@@ -56,7 +56,7 @@ public class OAuth2FlowHandlerImplTest {
         String clientSecret = "someClientSecret";
         String encodeFormat = "UTF-8";
         int responseCode = 200;
-        FieldSetter seturlStreamHandlerField = new FieldSetter(oAuth2FlowHandler, oAuth2FlowHandler.getClass().getDeclaredField("urlStreamHandler"));
+        new FieldSetter(oAuth2FlowHandler, oAuth2FlowHandler.getClass().getDeclaredField("urlStreamHandler")).set(urlStreamHandler);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
             String.format("{'access_token':'%s', 'expires_in':'1'}", token).getBytes("UTF-8")
         );
@@ -66,8 +66,6 @@ public class OAuth2FlowHandlerImplTest {
         doReturn(encodeFormat).when(appConfig).getEncoding();
         doReturn(new URL("http://www.google.com/")).when(appConfig).getTokenUrl();
         doReturn(mockTokenResponse).when(objectMapper).readValue(anyString(), eq(TokenResponse.class));
-
-        seturlStreamHandlerField.set(urlStreamHandler);
 
         doReturn(byteArrayInputStream).when(mockUrlConnection).getInputStream();
         doReturn(outputStream).when(mockUrlConnection).getOutputStream();
