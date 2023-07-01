@@ -56,7 +56,8 @@ public class OAuth2FlowHandlerImplTest {
         String clientSecret = "someClientSecret";
         String encodeFormat = "UTF-8";
         int responseCode = 200;
-        new FieldSetter(((Object)oAuth2FlowHandler), oAuth2FlowHandler.getClass().getDeclaredField("urlStreamHandler")).set(urlStreamHandler);
+        FieldSetter.setField(oAuth2FlowHandler, oAuth2FlowHandler.getClass().getDeclaredField("urlStreamHandler"), urlStreamHandler);
+        
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
             String.format("{'access_token':'%s', 'expires_in':'1'}", token).getBytes("UTF-8")
         );
