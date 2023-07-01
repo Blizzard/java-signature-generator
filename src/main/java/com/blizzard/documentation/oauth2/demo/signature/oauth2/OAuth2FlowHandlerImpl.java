@@ -8,10 +8,10 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-//import sun.net.www.protocol.http.Handler;
+import sun.net.www.protocol.https.Handler;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
+import java.net.HttpsURLConnection;
 import java.net.URL;
 import java.net.URLStreamHandler;
 import java.time.Instant;
@@ -54,7 +54,7 @@ public class OAuth2FlowHandlerImpl implements OAuth2FlowHandler {
 
             try{
             URL url = new URL(appConfig.getTokenUrl(), ""/*, urlStreamHandler*/);
-            con = (HttpURLConnection) url.openConnection();
+            con = (HttpsURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Authorization", String.format("Basic %s", encodedCredentials));
             con.setDoOutput(true);
