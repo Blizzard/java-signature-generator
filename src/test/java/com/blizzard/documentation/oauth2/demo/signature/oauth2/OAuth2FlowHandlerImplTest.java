@@ -65,7 +65,7 @@ public class OAuth2FlowHandlerImplTest {
         doReturn(clientId).when(envConfig).getClientId();
         doReturn(clientSecret).when(envConfig).getClientSecret();
         doReturn(encodeFormat).when(appConfig).getEncoding();
-        doReturn(new URL("https://us.api.blizzard.com/d3/data/item-type?locale=en_US)).when(appConfig).getTokenUrl();
+        doReturn(new URL("https://us.api.blizzard.com/d3/data/item-type?locale=en_US")).when(appConfig).getTokenUrl();
         doReturn(mockTokenResponse).when(objectMapper).readValue(anyString(), eq(TokenResponse.class));
 
         doReturn(byteArrayInputStream).when(mockUrlConnection).getInputStream();
